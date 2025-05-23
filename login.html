@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="bn" dir="ltr" class="h-full">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>লগইন - মাদ্রাসা ব্যবস্থাপনা সিস্টেম</title>
+  <meta name="description" content="মাদ্রাসা ব্যবস্থাপনা সিস্টেমে লগইন করুন">
+  <meta name="theme-color" content="#16a34a">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              300: '#86efac',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            }
+          },
+          fontFamily: {
+            'bangla': ['Hind Siliguri', 'sans-serif'],
+            'arabic': ['Amiri', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Alpine JS -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <!-- Favicon -->
+  <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon">
+  
+  <style>
+    [x-cloak] {
+      display: none !important;
+    }
+    
+    body {
+      font-family: 'Hind Siliguri', sans-serif;
+    }
+    
+    .arabic-text {
+      font-family: 'Amiri', serif;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 h-full flex items-center justify-center" x-data="login()" x-cloak>
+  <!-- Main Container -->
+  <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 mx-4 relative overflow-hidden">
+    <!-- Islamic Pattern Background -->
+    <div class="absolute inset-0 bg-[url('assets/images/islamic-pattern.png')] opacity-10"></div>
+    
+    <!-- Content -->
+    <div class="relative z-10">
+      <!-- Arabic Bismillah -->
+      <div class="mb-6 text-center">
+        <p class="text-sm arabic-text">بِسْمِ ٱللَّٰهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>
+      </div>
+      <!-- Logo and Title -->
+      <div class="flex flex-col items-center mb-6">
+        <img class="h-16 w-16 rounded-full mb-4" src="./images/logo.jpg" alt="Madrasa Logo">
+        <h1 class="text-2xl font-bold text-gray-900">মাদ্রাসা ব্যবস্থাপনা সিস্টেম</h1>
+        <p class="text-primary-600">অভিভাবক লগইন</p>
+      </div>
+      
+      <!-- Login Form -->
+      <form @submit.prevent="submitForm" class="space-y-4">
+        <!-- Email Field -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">ইমেইল</label>
+          <input id="email" type="email" x-model="form.email" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="আপনার ইমেইল প্রবেশ করান" aria-describedby="email-error">
+          <p x-show="errors.email" class="text-red-600 text-sm mt-1" x-text="errors.email" id="email-error"></p>
+        </div>
+        
+        <!-- Password Field -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">পাসওয়ার্ড</label>
+          <input id="password" type="password" x-model="form.password" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="আপনার পাসওয়ার্ড প্রবেশ করান" aria-describedby="password-error">
+          <p x-show="errors.password" class="text-red-600 text-sm mt-1" x-text="errors.password" id="password-error"></p>
+        </div>
+        
+        <!-- Submit Button -->
+        <button type="submit" class="w-full bg-primary-600 text-white py-2 px-4 rounded-lg hover:bg-primary-700 transition-colors" :disabled="isSubmitting">
+          <span x-show="!isSubmitting">লগইন করুন</span>
+          <span x-show="isSubmitting">প্রক্রিয়াকরণ...</span>
+        </button>
+      </form>
+      
+      <!-- Additional Links -->
+      <div class="mt-4 text-center">
+        <p class="text-sm text-gray-600">
+          অ্যাকাউন্ট নেই?
+          <a href="/register" class="text-primary-600 hover:text-primary-700 font-medium">নিবন্ধন করুন</a>
+        </p>
+        <p class="text-sm text-gray-600 mt-2">
+          পাসওয়ার্ড ভুলে গেছেন?
+          <a href="/forgot-password" class="text-primary-600 hover:text-primary-700 font-medium">পাসওয়ার্ড পুনরায় সেট করুন</a>
+        </p>
+      </div>
+      
+      
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('login', () => ({
+        form: {
+          email: '',
+          password: ''
+        },
+        errors: {
+          email: '',
+          password: ''
+        },
+        isSubmitting: false,
+        
+        submitForm() {
+          // Reset errors
+          this.errors.email = '';
+          this.errors.password = '';
+          
+          // Basic client-side validation
+          if (!this.form.email) {
+            this.errors.email = 'ইমেইল প্রয়োজন';
+            return;
+          }
+          if (!this.form.password) {
+            this.errors.password = 'পাসওয়ার্ড প্রয়োজন';
+            return;
+          }
+          
+          // Simulate form submission
+          this.isSubmitting = true;
+          setTimeout(() => {
+            // Replace with actual API call (e.g., fetch to backend)
+            console.log('Form submitted:', this.form);
+            this.isSubmitting = false;
+            // Redirect to dashboard on success
+            window.location.href = '/dashboard';
+          }, 1000);
+        }
+      }));
+    });
+  </script>
+</body>
+
+</html>
